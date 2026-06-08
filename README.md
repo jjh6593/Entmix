@@ -1,20 +1,18 @@
 # EntMix TabReD Runner
 
-이 저장소는 upstream TabReD를 `tabred/`에 두고, EntMix 쪽 코드만으로 TabReD classification
+이 저장소는 upstream TabReD를 `tabred/` submodule로 두고, EntMix 쪽 코드만으로 TabReD classification
 benchmark의 모델 사전학습, baseline 평가, NCTTA+EntMix TTA 평가를 실행하기 위한 재현 파이프라인입니다.
 
 원본 TabReD 학습 코드는 수정하지 않습니다. 데이터는 `data/`, 모델 checkpoint와 결과는 `artifacts/`에
-저장됩니다. 두 경로와 `tabred/`는 `.gitignore`에 포함되어 있습니다.
+저장됩니다. 두 경로는 `.gitignore`에 포함되어 있습니다.
 
 ## Installation
 
 TabReD 환경 생성 방식은 TabReD README의 environment 안내를 따릅니다.
 
 ```bash
-git clone https://github.com/yandex-research/tabred.git tabred
-cd tabred
-git checkout 36352fc567f5fb396bfc55bdec04e3cdf923e941
-cd ..
+git clone --recurse-submodules https://github.com/jjh6593/Entmix.git
+cd Entmix
 
 micromamba create -f environment.yml
 micromamba activate entmix-tabred
@@ -22,7 +20,13 @@ pip install -e tabred
 pip install -e .
 ```
 
-또는 bootstrap script로 같은 작업을 수행할 수 있습니다.
+이미 clone한 뒤 `tabred/`가 비어 있다면 submodule을 초기화하세요.
+
+```bash
+git submodule update --init --recursive
+```
+
+또는 bootstrap script로 TabReD checkout과 `tabred/data -> data/` symlink를 다시 확인할 수 있습니다.
 
 ```bash
 python scripts/bootstrap_tabred.py
@@ -152,22 +156,17 @@ python scripts/run_pipeline.py --stages tta --datasets ecom-offers --models mlp 
 
 ## TabReD 사용
 
-이 구조에서는 `tabred/`를 사용해도 됩니다. 다만 GitHub에 올릴 때 선택지는 둘입니다.
+`tabred/`는 Git submodule입니다. 이 repo를 `--recurse-submodules`로 clone하면 TabReD도 지정된
+upstream commit으로 함께 내려받습니다.
 
-1. `tabred/`를 `.gitignore`에 둔다.
-   - 현재 기본 방식입니다.
-   - README 또는 bootstrap script로 upstream TabReD를 다시 받게 합니다.
-
-2. `tabred/`를 포함해서 배포한다.
-   - TabReD는 Apache-2.0이므로 사용과 재배포가 가능합니다.
-   - 원본 `LICENSE`와 attribution을 유지해야 합니다.
-   - 수정한 TabReD 파일이 있다면 수정 사실을 표시해야 합니다.
-   - 데이터셋, checkpoint, prediction 같은 산출물은 별도 라이선스/용량 문제가 있으므로 포함하지 않습니다.
+TabReD는 Apache-2.0이므로 사용과 재배포가 가능합니다. 원본 `LICENSE`와 attribution을 유지해야 하며,
+수정한 TabReD 파일이 있다면 수정 사실을 표시해야 합니다. 이 repo는 TabReD 코드를 수정하지 않고
+submodule commit만 고정합니다.
 
 ## GitHub
 
 ```bash
-git add README.md LICENSE THIRD_PARTY_NOTICES.md .gitignore pyproject.toml environment.yml entmix scripts
+git add README.md LICENSE THIRD_PARTY_NOTICES.md .gitignore .gitmodules tabred pyproject.toml environment.yml entmix scripts
 git commit -m "Add EntMix TabReD reproduction pipeline"
 git remote add origin git@github.com:<your-id>/<your-repo>.git
 git push -u origin main
@@ -175,7 +174,6 @@ git push -u origin main
 
 Git에 올리지 않는 경로:
 
-- `tabred/`
 - `data/`
 - `artifacts/`
 - `*.pt`, `*.npz`, `*.npy`, `*.parquet`, `*.zip`, `*.csv`

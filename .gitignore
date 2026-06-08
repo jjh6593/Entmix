@@ -15,8 +15,7 @@ env/
 !.env.example
 kaggle.json
 
-# Upstream clone and generated artifacts
-tabred/
+# Generated artifacts
 data/
 artifacts/
 runs/
