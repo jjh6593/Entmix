@@ -31,6 +31,7 @@ SUPPORTED_MODELS = DEFAULT_MODELS
 DEFAULT_DATASETS = ("ecom-offers", "homecredit-default", "homesite-insurance")
 DEFAULT_SEEDS = (0, 1, 2)
 METRIC_ORDER = ("acc", "bacc", "f1", "macrof1", "aucroc", "precision", "recall")
+TERMINAL_METRICS = ("acc", "bacc", "f1", "macrof1")
 EPS = 1e-8
 
 MODEL_ALIASES = {
@@ -400,6 +401,20 @@ def compute_binary_metrics(y_true: np.ndarray, y_prob: np.ndarray) -> dict[str, 
     except ValueError:
         metrics["aucroc"] = float("nan")
     return metrics
+
+
+def format_metric_value(value: Any) -> str:
+    try:
+        value_f = float(value)
+    except Exception:
+        return "nan"
+    if not math.isfinite(value_f):
+        return "nan"
+    return f"{value_f:.5f}"
+
+
+def format_terminal_metrics(metrics: Mapping[str, float], keys: Sequence[str] = TERMINAL_METRICS) -> str:
+    return " ".join(f"{key}={format_metric_value(metrics.get(key, float('nan')))}" for key in keys)
 
 
 def evaluate_saved_predictions(output_dir: Path, config: Mapping[str, Any], report: Mapping[str, Any], split: str) -> dict[str, float]:

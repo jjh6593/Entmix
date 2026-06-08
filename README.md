@@ -37,6 +37,8 @@ python scripts/preprocess_datasets.py \
 ## 1. Pretrain
 
 ```bash
+export CUDA_VISIBLE_DEVICES=0
+
 python scripts/run_pretrain.py \
   --datasets ecom-offers \
   --models mlp \
@@ -59,6 +61,8 @@ Outputs:
 Smoke test:
 
 ```bash
+export CUDA_VISIBLE_DEVICES=0
+
 python scripts/run_pretrain.py \
   --datasets ecom-offers \
   --models mlp \
@@ -71,6 +75,8 @@ python scripts/run_pretrain.py \
 ## 2. TTA
 
 ```bash
+export CUDA_VISIBLE_DEVICES=0
+
 python scripts/run_tta.py \
   --datasets ecom-offers \
   --models mlp \
@@ -99,6 +105,8 @@ python scripts/run_tta.py --selected_json path/to/selected_tta_configs.json
 ## Pipeline
 
 ```bash
+export CUDA_VISIBLE_DEVICES=0
+
 python scripts/run_pipeline.py \
   --stages setup,preprocess,pretrain,tta \
   --datasets ecom-offers \
@@ -118,6 +126,7 @@ Step by step:
 ```bash
 python scripts/run_pipeline.py --stages setup
 python scripts/run_pipeline.py --stages preprocess --datasets ecom-offers
+export CUDA_VISIBLE_DEVICES=0
 python scripts/run_pipeline.py --stages pretrain --datasets ecom-offers --models mlp --seeds 0 --force_pretrain
 python scripts/run_pipeline.py --stages tta --datasets ecom-offers --models mlp --seeds 0
 ```
@@ -125,6 +134,7 @@ python scripts/run_pipeline.py --stages tta --datasets ecom-offers --models mlp 
 ## Notes
 
 - `tabred/` is a Git submodule.
+- When CUDA is available, set `CUDA_VISIBLE_DEVICES` explicitly before pretraining.
 - `data/` and `artifacts/` are ignored by Git.
 - Model files, predictions, datasets, and result CSV files are not committed.
 - See `THIRD_PARTY_NOTICES.md` for TabReD notes.

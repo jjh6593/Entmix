@@ -23,6 +23,7 @@ from .common import (
     compute_binary_metrics,
     configure_tabred,
     display_name,
+    format_terminal_metrics,
     load_toml,
     now_str,
     parse_int_csv_arg,
@@ -799,6 +800,10 @@ def run(args: argparse.Namespace) -> int:
             baseline_metrics = compute_binary_metrics(y_true, baseline_prob)
 
             if "baseline" in methods:
+                print(
+                    f"[tta-result] dataset={dataset_name} model={model_name} seed={seed} "
+                    f"split={args.split} method=baseline {format_terminal_metrics(baseline_metrics)}"
+                )
                 summary = results_root / dataset_name / "baseline" / "summary.csv"
                 compact = results_root / dataset_name / "baseline" / "summary_compact_runs.csv"
                 stats = results_root / dataset_name / "baseline" / "summary_stats.csv"
@@ -811,6 +816,10 @@ def run(args: argparse.Namespace) -> int:
                 cfg = cfg_from_params(params)
                 adapted_prob, adapted_y_true, final_prior = run_nctta_entmix_eval(bundle, batch_size, device=device, cfg=cfg)
                 adapted_metrics = compute_binary_metrics(adapted_y_true, adapted_prob)
+                print(
+                    f"[tta-result] dataset={dataset_name} model={model_name} seed={seed} "
+                    f"split={args.split} method=nctta_entmix {format_terminal_metrics(adapted_metrics)}"
+                )
                 summary = results_root / dataset_name / "nctta_entmix" / "summary.csv"
                 compact = results_root / dataset_name / "nctta_entmix" / "summary_compact_runs.csv"
                 stats = results_root / dataset_name / "nctta_entmix" / "summary_stats.csv"

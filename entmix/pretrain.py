@@ -15,6 +15,7 @@ from .common import (
     dump_run_config,
     evaluate_saved_predictions,
     export_config,
+    format_terminal_metrics,
     import_train_function,
     load_exported_config,
     parse_int_csv_arg,
@@ -102,6 +103,10 @@ def run(args: argparse.Namespace) -> int:
                 checkpoint_path=output_dir / "checkpoint.pt",
                 train_function=exported.train_function,
                 metrics=metrics,
+            )
+            print(
+                f"[pretrain-result] dataset={dataset_name} model={model_name} "
+                f"seed={seed} split={args.split} {format_terminal_metrics(metrics)}"
             )
 
             dataset_csv = pretrain_root / dataset_name / "pretrain_seed_results.csv"
