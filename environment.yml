@@ -11,6 +11,7 @@ dependencies:
   - loguru=0.7.2
   - numpy=1.26.4
   - pandas=2.2.1
+  - plotnine=0.13.4
   - polars=0.20.19
   - pyarrow=15.0.2
   - kaggle=1.6.11
