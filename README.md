@@ -21,7 +21,7 @@ git submodule update --init --recursive
 python scripts/bootstrap_tabred.py
 ```
 
-Kaggle datasets require the same setup described in the TabReD README.
+Kaggle datasets require API credentials. See `KAGGLE_SETUP.md`.
 
 ## Dataset
 
