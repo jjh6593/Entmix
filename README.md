@@ -1,14 +1,6 @@
-# EntMix TabReD Runner
-
-이 저장소는 upstream TabReD를 `tabred/` submodule로 두고, EntMix 쪽 코드만으로 TabReD classification
-benchmark의 모델 사전학습, baseline 평가, NCTTA+EntMix TTA 평가를 실행하기 위한 재현 파이프라인입니다.
-
-원본 TabReD 학습 코드는 수정하지 않습니다. 데이터는 `data/`, 모델 checkpoint와 결과는 `artifacts/`에
-저장됩니다. 두 경로는 `.gitignore`에 포함되어 있습니다.
+# EntMix
 
 ## Installation
-
-TabReD 환경 생성 방식은 TabReD README의 environment 안내를 따릅니다.
 
 ```bash
 git clone --recurse-submodules https://github.com/jjh6593/Entmix.git
@@ -16,29 +8,22 @@ cd Entmix
 
 micromamba create -f environment.yml
 micromamba activate entmix-tabred
+
 pip install -e tabred
 pip install -e .
-```
-
-이미 clone한 뒤 `tabred/`가 비어 있다면 submodule을 초기화하세요.
-
-```bash
-git submodule update --init --recursive
-```
-
-또는 bootstrap script로 TabReD checkout과 `tabred/data -> data/` symlink를 다시 확인할 수 있습니다.
-
-```bash
 python scripts/bootstrap_tabred.py
 ```
 
-For Kaggle datasets, enroll the respective competitions and have a Kaggle account, as described in
-the TabReD README.
+이미 clone한 뒤 `tabred/`가 비어 있다면:
+
+```bash
+git submodule update --init --recursive
+python scripts/bootstrap_tabred.py
+```
+
+Kaggle datasets require the same setup described in the TabReD README.
 
 ## Dataset
-
-기본 예시는 `ecom-offers`만 실행합니다. 다른 classification benchmark를 추가하려면 주석 처리된 값을
-사용하세요.
 
 ```bash
 DATASETS=ecom-offers
@@ -48,12 +33,7 @@ python scripts/preprocess_datasets.py \
   --datasets "$DATASETS"
 ```
 
-`tabred/data`는 `data/`로 연결되는 symlink입니다. TabReD 코드는 기존 `:data/...` 경로를 그대로 쓰고,
-실제 데이터는 이 저장소의 `data/`에 저장됩니다.
-
 ## 1. Pretrain
-
-기본 예시는 `MLP` 하나만 학습합니다. 다른 모델을 추가하려면 주석 처리된 값을 사용하세요.
 
 ```bash
 DATASETS=ecom-offers
@@ -72,14 +52,14 @@ python scripts/run_pretrain.py \
   --force
 ```
 
-출력:
+Outputs:
 
 - `artifacts/configs/<model>/<dataset>.toml`
 - `artifacts/pretrain/<dataset>/<model>/seed<seed>/checkpoint.pt`
 - `artifacts/pretrain/<dataset>/<model>/seed<seed>/report.json`
 - `artifacts/pretrain/pretrain_seed_results.csv`
 
-빠른 동작 확인만 하려면 epoch를 줄일 수 있습니다.
+Smoke test:
 
 ```bash
 python scripts/run_pretrain.py \
@@ -91,7 +71,7 @@ python scripts/run_pretrain.py \
   --force
 ```
 
-## 2. Baseline + NCTTA+EntMix
+## 2. TTA
 
 ```bash
 DATASETS=ecom-offers
@@ -110,15 +90,14 @@ python scripts/run_tta.py \
   --methods baseline,nctta_entmix
 ```
 
-출력:
+Outputs:
 
 - `artifacts/results/<dataset>/baseline/summary.csv`
 - `artifacts/results/<dataset>/nctta_entmix/summary.csv`
 - `artifacts/results/<dataset>/method_summary.csv`
 - `artifacts/results/all_summary_compact_runs.csv`
 
-기본 NCTTA+EntMix hyperparameter는 `2026-04-12 latest_hpo_best_bacc_full` 선택값을
-dataset/model별로 내장했습니다. 다른 선택 파일을 쓰려면:
+Use a selected config JSON:
 
 ```bash
 python scripts/run_tta.py --selected_json path/to/selected_tta_configs.json
@@ -145,7 +124,7 @@ python scripts/run_pipeline.py \
   --force_pretrain
 ```
 
-단계별 실행:
+Step by step:
 
 ```bash
 python scripts/run_pipeline.py --stages setup
@@ -154,26 +133,9 @@ python scripts/run_pipeline.py --stages pretrain --datasets ecom-offers --models
 python scripts/run_pipeline.py --stages tta --datasets ecom-offers --models mlp --seeds 0
 ```
 
-## TabReD 사용
+## Notes
 
-`tabred/`는 Git submodule입니다. 이 repo를 `--recurse-submodules`로 clone하면 TabReD도 지정된
-upstream commit으로 함께 내려받습니다.
-
-TabReD는 Apache-2.0이므로 사용과 재배포가 가능합니다. 원본 `LICENSE`와 attribution을 유지해야 하며,
-수정한 TabReD 파일이 있다면 수정 사실을 표시해야 합니다. 이 repo는 TabReD 코드를 수정하지 않고
-submodule commit만 고정합니다.
-
-## GitHub
-
-```bash
-git add README.md LICENSE THIRD_PARTY_NOTICES.md .gitignore .gitmodules tabred pyproject.toml environment.yml entmix scripts
-git commit -m "Add EntMix TabReD reproduction pipeline"
-git remote add origin git@github.com:<your-id>/<your-repo>.git
-git push -u origin main
-```
-
-Git에 올리지 않는 경로:
-
-- `data/`
-- `artifacts/`
-- `*.pt`, `*.npz`, `*.npy`, `*.parquet`, `*.zip`, `*.csv`
+- `tabred/` is a Git submodule.
+- `data/` and `artifacts/` are ignored by Git.
+- Model files, predictions, datasets, and result CSV files are not committed.
+- See `THIRD_PARTY_NOTICES.md` for TabReD license notes.
