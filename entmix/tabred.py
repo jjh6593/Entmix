@@ -6,7 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from .paths import DATA_ROOT, TABRED_COMMIT, TABRED_REPO_URL, ensure_project_dirs, resolve_tabred_root
+from .paths import DATA_ROOT, PROJECT_ROOT, TABRED_COMMIT, TABRED_REPO_URL, ensure_project_dirs, resolve_tabred_root
 
 
 def run_command(args: list[str], cwd: Path | None = None) -> None:
@@ -30,7 +30,20 @@ def clone_or_checkout_tabred(
         root.parent.mkdir(parents=True, exist_ok=True)
         run_command(["git", "clone", repo_url, str(root)])
     elif not (root / ".git").exists():
-        raise RuntimeError(f"{root} exists but is not a git checkout. Move it or pass --force.")
+        gitmodules = PROJECT_ROOT / ".gitmodules"
+        if gitmodules.exists() and root == resolve_tabred_root(None):
+            run_command(["git", "submodule", "update", "--init", "--recursive", "--", "tabred"], cwd=PROJECT_ROOT)
+        elif root.is_dir() and not any(root.iterdir()):
+            shutil.rmtree(root)
+            run_command(["git", "clone", repo_url, str(root)])
+        else:
+            raise RuntimeError(
+                f"{root} exists but is not a git checkout. "
+                "Run `git submodule update --init --recursive` or pass --force."
+            )
+
+    if not (root / ".git").exists():
+        raise RuntimeError(f"TabReD checkout is still missing at {root}")
 
     run_command(["git", "fetch", "--tags", "origin"], cwd=root)
     run_command(["git", "checkout", commit], cwd=root)
