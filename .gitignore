@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Local secrets and environment
+.env
+.env.*
+!.env.example
+kaggle.json
+
+# Upstream clone and generated artifacts
+tabred/
+data/
+artifacts/
+runs/
+cache/
+logs/
+
+# Heavy data/model/result files
+*.bin
+*.cbm
+*.csv
+*.feather
+*.h5
+*.joblib
+*.npy
+*.npz
+*.parquet
+*.pickle
+*.pkl
+*.pt
+*.pth
+*.rar
+*.tar
+*.tar.*
+*.tmp
+*.zip
+*.xlsx
+events.out.tfevents.*
+
+# Editors/OS
+.DS_Store
+.vscode/
+.idea/
