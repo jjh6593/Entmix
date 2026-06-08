@@ -1,15 +1,17 @@
 # Third-Party Notices
 
-This project does not vendor the TabReD source tree by default. The bootstrap
-script clones TabReD from:
+This project uses TabReD as a Git submodule:
 
 - https://github.com/yandex-research/tabred
 
-TabReD is distributed under the Apache License 2.0. When TabReD is cloned into
-`tabred`, keep its original `LICENSE` file and upstream attribution
-intact. If you later choose to fork or redistribute modified TabReD files, retain
-the Apache-2.0 license text, retain upstream copyright/attribution notices, and
-mark files that you changed.
+TabReD is located at `tabred/`. No TabReD source files are modified by this
+project. The TabReD license and upstream attribution are kept in
+`tabred/LICENSE`.
+
+Local runtime setup may create `tabred/data -> ../data` so that TabReD's
+existing `:data/...` paths can read datasets stored in this repository's
+ignored `data/` directory. This symlink is a runtime setup detail, not a TabReD
+source-code modification.
 
 TabReD datasets are downloaded from Kaggle or competition pages. Dataset use is
 governed by the terms of the respective dataset/competition, not by this

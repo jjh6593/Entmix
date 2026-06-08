@@ -138,4 +138,4 @@ python scripts/run_pipeline.py --stages tta --datasets ecom-offers --models mlp 
 - `tabred/` is a Git submodule.
 - `data/` and `artifacts/` are ignored by Git.
 - Model files, predictions, datasets, and result CSV files are not committed.
-- See `THIRD_PARTY_NOTICES.md` for TabReD license notes.
+- See `THIRD_PARTY_NOTICES.md` for TabReD notes.
