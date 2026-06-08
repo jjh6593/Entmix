@@ -6,8 +6,8 @@
 git clone --recurse-submodules https://github.com/jjh6593/Entmix.git
 cd Entmix
 
-micromamba create -f environment.yml
-micromamba activate entmix-tabred
+conda env create -f environment.yml
+conda activate entmix-tabred
 
 pip install -e tabred
 pip install -e .
