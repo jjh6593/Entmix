@@ -26,30 +26,26 @@ Kaggle datasets require the same setup described in the TabReD README.
 ## Dataset
 
 ```bash
-DATASETS=ecom-offers
-# DATASETS=ecom-offers,homecredit-default,homesite-insurance
-
 python scripts/preprocess_datasets.py \
-  --datasets "$DATASETS"
+  --datasets ecom-offers
+
+# Add more datasets:
+#   --datasets ecom-offers,homecredit-default,homesite-insurance
 ```
 
 ## 1. Pretrain
 
 ```bash
-DATASETS=ecom-offers
-# DATASETS=ecom-offers,homecredit-default,homesite-insurance
-
-MODELS=mlp
-# MODELS=mlp,snn,dcn2,resnet,ft_transformer
-
-SEEDS=0
-# SEEDS=0,1,2
-
 python scripts/run_pretrain.py \
-  --datasets "$DATASETS" \
-  --models "$MODELS" \
-  --seeds "$SEEDS" \
+  --datasets ecom-offers \
+  --models mlp \
+  --seeds 0 \
   --force
+
+# Add more datasets/models/seeds:
+#   --datasets ecom-offers,homecredit-default,homesite-insurance
+#   --models mlp,snn,dcn2,resnet,ft_transformer
+#   --seeds 0,1,2
 ```
 
 Outputs:
@@ -74,20 +70,16 @@ python scripts/run_pretrain.py \
 ## 2. TTA
 
 ```bash
-DATASETS=ecom-offers
-# DATASETS=ecom-offers,homecredit-default,homesite-insurance
-
-MODELS=mlp
-# MODELS=mlp,snn,dcn2,resnet,ft_transformer
-
-SEEDS=0
-# SEEDS=0,1,2
-
 python scripts/run_tta.py \
-  --datasets "$DATASETS" \
-  --models "$MODELS" \
-  --seeds "$SEEDS" \
+  --datasets ecom-offers \
+  --models mlp \
+  --seeds 0 \
   --methods baseline,nctta_entmix
+
+# Add more datasets/models/seeds:
+#   --datasets ecom-offers,homecredit-default,homesite-insurance
+#   --models mlp,snn,dcn2,resnet,ft_transformer
+#   --seeds 0,1,2
 ```
 
 Outputs:
@@ -106,22 +98,18 @@ python scripts/run_tta.py --selected_json path/to/selected_tta_configs.json
 ## Pipeline
 
 ```bash
-DATASETS=ecom-offers
-# DATASETS=ecom-offers,homecredit-default,homesite-insurance
-
-MODELS=mlp
-# MODELS=mlp,snn,dcn2,resnet,ft_transformer
-
-SEEDS=0
-# SEEDS=0,1,2
-
 python scripts/run_pipeline.py \
   --stages setup,preprocess,pretrain,tta \
-  --datasets "$DATASETS" \
-  --models "$MODELS" \
-  --seeds "$SEEDS" \
+  --datasets ecom-offers \
+  --models mlp \
+  --seeds 0 \
   --methods baseline,nctta_entmix \
   --force_pretrain
+
+# Add more datasets/models/seeds:
+#   --datasets ecom-offers,homecredit-default,homesite-insurance
+#   --models mlp,snn,dcn2,resnet,ft_transformer
+#   --seeds 0,1,2
 ```
 
 Step by step:
