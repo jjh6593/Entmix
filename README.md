@@ -5,20 +5,11 @@
 ```bash
 git clone --recurse-submodules https://github.com/jjh6593/Entmix.git
 cd Entmix
-git submodule update --init --recursive
 
 conda env create -f environment.yml
 conda activate entmix-tabred
 
-pip install -e tabred
 pip install -e .
-python scripts/bootstrap_tabred.py
-```
-
-이미 clone한 뒤 `tabred/`가 비어 있다면:
-
-```bash
-git submodule update --init --recursive
 python scripts/bootstrap_tabred.py
 ```
 
