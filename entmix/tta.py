@@ -85,6 +85,35 @@ class NCTTAEntMixConfig:
     entmix: EntMixConfig = field(default_factory=EntMixConfig)
 
 
+@dataclass
+class DPLEConfig:
+    tau_init: float = 5.0
+    tau_min: float = 1.0
+    tau_decay: float = 0.995
+    ema_momentum: float = 0.3
+    beta: float = 2.0
+    eps: float = EPS
+
+
+@dataclass
+class NCTTADPLEConfig:
+    lr: float = 1e-4
+    weight_decay: float = 0.0
+    steps_per_batch: int = 1
+    alpha: float = 0.35
+    top_k: int = 1
+    distance_eps: float = 0.5
+    tau_ent: float = 0.3
+    entropy_threshold: float | None = 0.53
+    nu: float = 1.0
+    eta: float = 1.0
+    adaptive_weight_mode: str = "intended_product"
+    intended_product_nu_mode: str = "separate_multiplier"
+    sample_selection_mode: str = "threshold"
+    confidence_metric_mode: str = "entropy"
+    dple: DPLEConfig = field(default_factory=DPLEConfig)
+
+
 COMMON_HPO_DEFAULTS: dict[str, Any] = {
     "batch_size_by_model": {"default": 512, "ft_transformer": 128},
     "entmix_max": 1.0,
@@ -102,6 +131,15 @@ COMMON_HPO_DEFAULTS: dict[str, Any] = {
     "nctta_tau_ent": 0.3,
     "nctta_top_k": 1,
     "nctta_weight_decay": 0.0,
+}
+
+DPLE_HPO_DEFAULTS: dict[str, Any] = {
+    **COMMON_HPO_DEFAULTS,
+    "dple_tau_init": 5.0,
+    "dple_tau_min": 1.0,
+    "dple_tau_decay": 0.995,
+    "dple_ema_momentum": 0.3,
+    "dple_beta": 2.0,
 }
 
 HPO_BACC_20260412: dict[str, dict[str, dict[str, Any]]] = {
@@ -125,6 +163,30 @@ HPO_BACC_20260412: dict[str, dict[str, dict[str, Any]]] = {
         "dcn2": {"entmix_prior_alpha": 0.95, "nctta_entropy_threshold": 0.35, "nctta_lr": 1e-5},
         "resnet": {"entmix_prior_alpha": 0.95, "nctta_entropy_threshold": 0.35, "nctta_lr": 1e-3},
         "ft_transformer": {"entmix_prior_alpha": 0.95, "nctta_entropy_threshold": 0.35, "nctta_lr": 1e-6},
+    },
+}
+
+HPO_BACC_DPLE_20260412: dict[str, dict[str, dict[str, Any]]] = {
+    "ecom-offers": {
+        "mlp": {"nctta_lr": 1e-4, "nctta_entropy_threshold": 0.53, "dple_tau_init": 5.0, "dple_tau_min": 1.0, "dple_tau_decay": 0.995, "dple_ema_momentum": 0.3, "dple_beta": 1.0},
+        "snn": {"nctta_lr": 1e-4, "nctta_entropy_threshold": 0.53, "dple_tau_init": 5.0, "dple_tau_min": 1.0, "dple_tau_decay": 0.995, "dple_ema_momentum": 0.3, "dple_beta": 1.0},
+        "dcn2": {"nctta_lr": 1e-3, "nctta_entropy_threshold": 0.53, "dple_tau_init": 3.0, "dple_tau_min": 0.75, "dple_tau_decay": 0.99, "dple_ema_momentum": 0.5, "dple_beta": 1.0},
+        "resnet": {"nctta_lr": 1e-3, "nctta_entropy_threshold": 0.611, "dple_tau_init": 3.0, "dple_tau_min": 0.75, "dple_tau_decay": 0.99, "dple_ema_momentum": 0.5, "dple_beta": 1.0},
+        "ft_transformer": {"nctta_lr": 1e-4, "nctta_entropy_threshold": 0.611, "dple_tau_init": 8.0, "dple_tau_min": 1.0, "dple_tau_decay": 0.995, "dple_ema_momentum": 0.3, "dple_beta": 2.0},
+    },
+    "homecredit-default": {
+        "mlp": {"nctta_lr": 1e-5, "nctta_entropy_threshold": 0.611, "dple_tau_init": 8.0, "dple_tau_min": 1.0, "dple_tau_decay": 0.995, "dple_ema_momentum": 0.3, "dple_beta": 2.0},
+        "snn": {"nctta_lr": 1e-6, "nctta_entropy_threshold": 0.35, "dple_tau_init": 8.0, "dple_tau_min": 1.0, "dple_tau_decay": 0.995, "dple_ema_momentum": 0.3, "dple_beta": 2.0},
+        "dcn2": {"nctta_lr": 1e-6, "nctta_entropy_threshold": 0.53, "dple_tau_init": 8.0, "dple_tau_min": 1.0, "dple_tau_decay": 0.995, "dple_ema_momentum": 0.3, "dple_beta": 2.0},
+        "resnet": {"nctta_lr": 1e-3, "nctta_entropy_threshold": 0.53, "dple_tau_init": 3.0, "dple_tau_min": 0.75, "dple_tau_decay": 0.99, "dple_ema_momentum": 0.5, "dple_beta": 1.0},
+        "ft_transformer": {"nctta_lr": 1e-6, "nctta_entropy_threshold": 0.35, "dple_tau_init": 8.0, "dple_tau_min": 1.0, "dple_tau_decay": 0.995, "dple_ema_momentum": 0.3, "dple_beta": 2.0},
+    },
+    "homesite-insurance": {
+        "mlp": {"nctta_lr": 1e-3, "nctta_entropy_threshold": 0.611, "dple_tau_init": 8.0, "dple_tau_min": 1.0, "dple_tau_decay": 0.995, "dple_ema_momentum": 0.3, "dple_beta": 2.0},
+        "snn": {"nctta_lr": 1e-5, "nctta_entropy_threshold": 0.611, "dple_tau_init": 8.0, "dple_tau_min": 1.0, "dple_tau_decay": 0.995, "dple_ema_momentum": 0.3, "dple_beta": 2.0},
+        "dcn2": {"nctta_lr": 1e-5, "nctta_entropy_threshold": 0.35, "dple_tau_init": 8.0, "dple_tau_min": 1.0, "dple_tau_decay": 0.995, "dple_ema_momentum": 0.3, "dple_beta": 2.0},
+        "resnet": {"nctta_lr": 1e-3, "nctta_entropy_threshold": 0.35, "dple_tau_init": 8.0, "dple_tau_min": 1.0, "dple_tau_decay": 0.995, "dple_ema_momentum": 0.3, "dple_beta": 2.0},
+        "ft_transformer": {"nctta_lr": 1e-6, "nctta_entropy_threshold": 0.53, "dple_tau_init": 8.0, "dple_tau_min": 1.0, "dple_tau_decay": 0.995, "dple_ema_momentum": 0.3, "dple_beta": 2.0},
     },
 }
 
@@ -159,6 +221,18 @@ def logits_to_probs(logits: torch.Tensor) -> torch.Tensor:
     else:
         raise ValueError(f"binary logits expected, got shape={tuple(logits.shape)}")
     return normalize_probs(probs)
+
+
+def logits_to_classwise_logits(logits: torch.Tensor) -> torch.Tensor:
+    if logits.ndim == 1:
+        logits = logits.unsqueeze(1)
+    if logits.ndim != 2:
+        raise ValueError(f"classwise logits expected, got shape={tuple(logits.shape)}")
+    if logits.shape[1] == 1:
+        return torch.cat([torch.zeros_like(logits), logits], dim=1)
+    if logits.shape[1] == 2:
+        return logits
+    raise ValueError(f"binary logits expected, got shape={tuple(logits.shape)}")
 
 
 def map_binary_labels(y: np.ndarray) -> tuple[np.ndarray, dict[Any, int]]:
@@ -589,8 +663,206 @@ def run_nctta_entmix_eval(
     )
 
 
-def resolve_json_selected_params(payload: Mapping[str, Any], dataset: str, model: str) -> dict[str, Any]:
-    method_block = dict(payload.get("nctta_entmix", payload.get("propose", {})))
+class DPLEPriorCorrector:
+    def __init__(self, source_prior: torch.Tensor, cfg: DPLEConfig, device: torch.device):
+        self.device = device
+        self.source_prior = normalize_probs(source_prior.detach().to(device=device, dtype=torch.float32))
+        self.log_source_prior = self.source_prior.clamp(min=float(cfg.eps)).log()
+        self.p_hat_t = self.source_prior.clone()
+        self.tau_init = float(cfg.tau_init)
+        self.tau = float(cfg.tau_init)
+        self.tau_min = float(cfg.tau_min)
+        self.tau_decay = float(cfg.tau_decay)
+        self.ema_momentum = float(cfg.ema_momentum)
+        self.beta = float(cfg.beta)
+        self.eps = float(cfg.eps)
+        self.n_samples = 0
+
+    @torch.no_grad()
+    def update(self, classwise_logits: torch.Tensor) -> None:
+        z_tilde = classwise_logits - self.log_source_prior.unsqueeze(0)
+        q = torch.softmax(z_tilde / max(self.tau, self.eps), dim=1)
+        weights = torch.exp(-prob_entropy(q))
+        weights_sum = weights.sum()
+        if float(weights_sum.item()) > self.eps:
+            p_batch = (weights.unsqueeze(1) * q).sum(dim=0) / weights_sum
+        else:
+            p_batch = self.source_prior.clone()
+        self.p_hat_t = normalize_probs((1.0 - self.ema_momentum) * self.p_hat_t + self.ema_momentum * p_batch)
+        self.tau = max(self.tau_min, self.tau * self.tau_decay)
+        self.n_samples += int(classwise_logits.shape[0])
+
+    def target_prior(self) -> torch.Tensor:
+        n_classes = int(self.p_hat_t.numel())
+        denom = float(self.n_samples) + n_classes * self.beta
+        if denom <= self.eps:
+            return self.p_hat_t.clone()
+        p_reg = (float(self.n_samples) * self.p_hat_t + self.beta) / denom
+        return normalize_probs(p_reg)
+
+    @torch.no_grad()
+    def process_logits(self, logits: torch.Tensor, update_prior: bool = True) -> torch.Tensor:
+        classwise_logits = logits_to_classwise_logits(logits.detach()).to(device=self.device, dtype=torch.float32)
+        if update_prior:
+            self.update(classwise_logits)
+        p_t = self.target_prior()
+        log_ratio = p_t.clamp(min=self.eps).log() - self.source_prior.clamp(min=self.eps).log()
+        corrected_logits = classwise_logits + log_ratio.unsqueeze(0)
+        return torch.softmax(corrected_logits, dim=1)
+
+    def target_prior_numpy(self) -> np.ndarray:
+        return self.target_prior().detach().cpu().numpy().astype(np.float32)
+
+
+class NCTTADPLEAdapter(torch.nn.Module):
+    def __init__(self, base_model: torch.nn.Module, source_prior: torch.Tensor, cfg: NCTTADPLEConfig, device: torch.device):
+        super().__init__()
+        self.model = copy.deepcopy(base_model).to(device)
+        self.device = device
+        self.lr = float(cfg.lr)
+        self.weight_decay = float(cfg.weight_decay)
+        self.steps_per_batch = max(1, int(cfg.steps_per_batch))
+        self.alpha = float(cfg.alpha)
+        self.top_k = max(1, int(cfg.top_k))
+        self.distance_eps = float(cfg.distance_eps)
+        self.tau_ent = float(cfg.tau_ent)
+        self.entropy_threshold = float(
+            prob_entropy(torch.tensor([[0.7, 0.3]], device=device))[0].item()
+            if cfg.entropy_threshold is None
+            else cfg.entropy_threshold
+        )
+        self.nu = float(cfg.nu)
+        self.eta = float(cfg.eta)
+        self.adaptive_weight_mode = str(cfg.adaptive_weight_mode)
+        self.intended_product_nu_mode = str(cfg.intended_product_nu_mode)
+        self.sample_selection_mode = str(cfg.sample_selection_mode)
+        self.confidence_metric_mode = str(cfg.confidence_metric_mode)
+        self.optimizer = torch.optim.SGD(
+            [p for p in self.model.parameters() if p.requires_grad],
+            lr=self.lr,
+            weight_decay=self.weight_decay,
+        )
+        self.corrector = DPLEPriorCorrector(source_prior, cfg.dple, device=device)
+
+    def _get_features_logits_and_probs(
+        self, batch: Mapping[str, torch.Tensor]
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        logits, features = forward_logits_and_features(self.model, batch)
+        return features, logits, logits_to_probs(logits)
+
+    def _fca(self, features: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        class_weights = get_classifier_weight(self.model)
+        feat_norm = F.normalize(features, p=2, dim=1, eps=EPS)
+        weight_norm = F.normalize(class_weights, p=2, dim=1, eps=EPS)
+        similarity = feat_norm @ weight_norm.T
+        distances = (feat_norm[:, None, :] - weight_norm[None, :, :]).pow(2).sum(dim=2)
+        return distances, similarity
+
+    def _multi_positive_nce(self, similarity: torch.Tensor, positive_idx: torch.Tensor) -> torch.Tensor:
+        pos_mask = torch.zeros_like(similarity, dtype=torch.bool)
+        pos_mask.scatter_(1, positive_idx, True)
+        log_num = torch.logsumexp(similarity.masked_fill(~pos_mask, float("-inf")), dim=1)
+        log_den = torch.logsumexp(similarity, dim=1)
+        return -(log_num - log_den)
+
+    def _neighbor_mask(self, batch: Mapping[str, torch.Tensor], probs: torch.Tensor) -> torch.Tensor:
+        if self.sample_selection_mode == "none":
+            return torch.ones(probs.shape[0], dtype=torch.float32, device=self.device)
+        samples = concat_batch_features(batch).detach().cpu()
+        pairwise = torch.cdist(samples, samples, p=2)
+        distance_threshold = pairwise.mean()
+        near_neighbor = (pairwise <= distance_threshold).float()
+        pseudo = probs.detach().argmax(dim=1).float().cpu()
+        neighbor_mean = (near_neighbor @ pseudo.unsqueeze(1)).squeeze(1)
+        neighbor_mean = neighbor_mean / near_neighbor.sum(dim=1).clamp(min=1.0)
+        mask = (neighbor_mean - pseudo).abs().le(0.3)
+        return mask.to(self.device, dtype=torch.float32)
+
+    def _adaptive_weight(self, corrected_entropy: torch.Tensor, pseudo_dist: torch.Tensor) -> torch.Tensor:
+        entropy_exp_term = torch.exp(corrected_entropy - self.tau_ent)
+        if self.confidence_metric_mode != "entropy":
+            raise ValueError(f"unsupported confidence_metric_mode={self.confidence_metric_mode}")
+        lhs_weight = 1.0 / entropy_exp_term
+        if self.sample_selection_mode == "threshold":
+            select_mask = (corrected_entropy < self.entropy_threshold).float()
+        elif self.sample_selection_mode in {"none", "ftta_neighbors"}:
+            select_mask = torch.ones_like(lhs_weight)
+        else:
+            raise ValueError(f"unsupported sample_selection_mode={self.sample_selection_mode}")
+
+        if self.adaptive_weight_mode == "intended_product":
+            if self.intended_product_nu_mode == "separate_multiplier":
+                weight = lhs_weight * (self.nu / (1.0 + self.eta * pseudo_dist))
+            elif self.intended_product_nu_mode == "denom_plus_nu":
+                weight = (1.0 / (entropy_exp_term + self.nu)) * (1.0 / (1.0 + self.eta * pseudo_dist))
+            else:
+                raise ValueError(f"unsupported intended_product_nu_mode={self.intended_product_nu_mode}")
+        elif self.adaptive_weight_mode == "current_sum":
+            weight = lhs_weight + (self.nu / (1.0 + self.eta * pseudo_dist))
+        else:
+            raise ValueError(f"unsupported adaptive_weight_mode={self.adaptive_weight_mode}")
+        return weight * select_mask
+
+    def _batch_loss(self, batch: Mapping[str, torch.Tensor]) -> torch.Tensor:
+        features, logits, probs = self._get_features_logits_and_probs(batch)
+        corrected_probs = self.corrector.process_logits(logits, update_prior=False)
+        corrected_entropy = prob_entropy(corrected_probs).detach()
+        distances, similarity = self._fca(features)
+        distance_term = torch.exp(-distances / max(self.distance_eps, EPS))
+        hybrid = (1.0 - self.alpha) * distance_term + self.alpha * corrected_probs
+        positive_idx = torch.topk(hybrid, k=min(self.top_k, hybrid.shape[1]), dim=1).indices
+        nc_loss = self._multi_positive_nce(similarity, positive_idx)
+        ent_loss = prob_entropy(probs)
+        pseudo_idx = corrected_probs.argmax(dim=1, keepdim=True)
+        pseudo_dist = distances.gather(1, pseudo_idx).squeeze(1).detach()
+        adaptive_weight = self._adaptive_weight(corrected_entropy, pseudo_dist)
+        if self.sample_selection_mode == "ftta_neighbors":
+            adaptive_weight = adaptive_weight * self._neighbor_mask(batch, probs)
+        loss_vec = adaptive_weight * (ent_loss + nc_loss)
+        return loss_vec.sum() / adaptive_weight.sum().clamp(min=EPS)
+
+    @torch.enable_grad()
+    def adapt_and_predict(self, batch: Mapping[str, torch.Tensor]) -> torch.Tensor:
+        for _ in range(self.steps_per_batch):
+            self.model.train()
+            self.optimizer.zero_grad(set_to_none=True)
+            loss = self._batch_loss(batch)
+            if torch.isfinite(loss):
+                loss.backward()
+                self.optimizer.step()
+
+        self.model.eval()
+        with torch.no_grad():
+            _, logits_after, _ = self._get_features_logits_and_probs(batch)
+            corrected = self.corrector.process_logits(logits_after, update_prior=True)
+        return corrected[:, 1].detach()
+
+
+def run_nctta_dple_eval(
+    bundle: SeedBundle,
+    batch_size: int,
+    device: torch.device,
+    cfg: NCTTADPLEConfig,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    adapter = NCTTADPLEAdapter(bundle.model, bundle.source_prior, cfg, device=device)
+    probs_all: list[np.ndarray] = []
+    y_all: list[np.ndarray] = []
+    for batch, y in build_batches(bundle.dataset, bundle.split, batch_size, device=device, shuffle=False):
+        probs = adapter.adapt_and_predict(batch)
+        probs_all.append(probs.detach().cpu().numpy().astype(np.float32))
+        y_all.append(apply_label_mapping(y.detach().cpu().numpy(), bundle.label_mapping))
+    return (
+        np.concatenate(probs_all),
+        np.concatenate(y_all),
+        adapter.corrector.target_prior_numpy(),
+    )
+
+
+def resolve_json_selected_params(payload: Mapping[str, Any], dataset: str, model: str, method: str) -> dict[str, Any]:
+    if method == "nctta_entmix":
+        method_block = dict(payload.get("nctta_entmix", payload.get("propose", {})))
+    else:
+        method_block = dict(payload.get(method, {}))
     selected = dict(method_block.get("selected", {}))
     params: dict[str, Any] = {}
     default_params = selected.get("default")
@@ -609,18 +881,27 @@ def resolve_json_selected_params(payload: Mapping[str, Any], dataset: str, model
     return params
 
 
-def selected_hpo_params(dataset: str, model: str, selected_json: str | None = None) -> dict[str, Any]:
+def selected_hpo_params(
+    dataset: str,
+    model: str,
+    selected_json: str | None = None,
+    method: str = "nctta_entmix",
+) -> dict[str, Any]:
     if selected_json:
         payload = json.loads(Path(selected_json).read_text(encoding="utf-8"))
-        params = resolve_json_selected_params(payload, dataset, model)
+        params = resolve_json_selected_params(payload, dataset, model, method)
         if params:
             return params
-    params = dict(COMMON_HPO_DEFAULTS)
-    params.update(HPO_BACC_20260412[dataset][model])
+    if method == "nctta_dple":
+        params = dict(DPLE_HPO_DEFAULTS)
+        params.update(HPO_BACC_DPLE_20260412[dataset][model])
+    else:
+        params = dict(COMMON_HPO_DEFAULTS)
+        params.update(HPO_BACC_20260412[dataset][model])
     return params
 
 
-def cfg_from_params(params: Mapping[str, Any]) -> NCTTAEntMixConfig:
+def entmix_cfg_from_params(params: Mapping[str, Any]) -> NCTTAEntMixConfig:
     return NCTTAEntMixConfig(
         lr=float(params.get("nctta_lr", 1e-4)),
         weight_decay=float(params.get("nctta_weight_decay", 0.0)),
@@ -648,6 +929,34 @@ def cfg_from_params(params: Mapping[str, Any]) -> NCTTAEntMixConfig:
     )
 
 
+def dple_cfg_from_params(params: Mapping[str, Any]) -> NCTTADPLEConfig:
+    return NCTTADPLEConfig(
+        lr=float(params.get("nctta_lr", 1e-4)),
+        weight_decay=float(params.get("nctta_weight_decay", 0.0)),
+        steps_per_batch=int(params.get("nctta_steps_per_batch", 1)),
+        alpha=float(params.get("nctta_alpha", 0.35)),
+        top_k=int(params.get("nctta_top_k", 1)),
+        distance_eps=float(params.get("nctta_distance_eps", 0.5)),
+        tau_ent=float(params.get("nctta_tau_ent", 0.3)),
+        entropy_threshold=None
+        if params.get("nctta_entropy_threshold") is None
+        else float(params.get("nctta_entropy_threshold")),
+        nu=float(params.get("nctta_nu", 1.0)),
+        eta=float(params.get("nctta_eta", 1.0)),
+        adaptive_weight_mode=str(params.get("nctta_adaptive_weight_mode", "intended_product")),
+        intended_product_nu_mode=str(params.get("nctta_intended_product_nu_mode", "separate_multiplier")),
+        sample_selection_mode=str(params.get("nctta_sample_selection_mode", "threshold")),
+        confidence_metric_mode=str(params.get("nctta_confidence_metric_mode", "entropy")),
+        dple=DPLEConfig(
+            tau_init=float(params.get("dple_tau_init", 5.0)),
+            tau_min=float(params.get("dple_tau_min", 1.0)),
+            tau_decay=float(params.get("dple_tau_decay", 0.995)),
+            ema_momentum=float(params.get("dple_ema_momentum", 0.3)),
+            beta=float(params.get("dple_beta", 2.0)),
+        ),
+    )
+
+
 def resolve_batch_size(params: Mapping[str, Any], model_name: str, fallback: int | None = None) -> int:
     if fallback is not None:
         return int(fallback)
@@ -663,11 +972,22 @@ def resolve_batch_size(params: Mapping[str, Any], model_name: str, fallback: int
 
 
 def parse_methods(value: str) -> list[str]:
-    aliases = {"baseline": "baseline", "unadapt": "baseline", "nctta_entmix": "nctta_entmix", "propose": "nctta_entmix"}
-    methods = [aliases[x.strip().lower()] for x in str(value).split(",") if x.strip()]
-    invalid = [x for x in methods if x not in {"baseline", "nctta_entmix"}]
+    aliases = {
+        "baseline": "baseline",
+        "unadapt": "baseline",
+        "nctta_entmix": "nctta_entmix",
+        "nctta-entmix": "nctta_entmix",
+        "nctta+entmix": "nctta_entmix",
+        "propose": "nctta_entmix",
+        "nctta_dple": "nctta_dple",
+        "nctta-dple": "nctta_dple",
+        "nctta+dple": "nctta_dple",
+    }
+    requested = [x.strip().lower() for x in str(value).split(",") if x.strip()]
+    invalid = [x for x in requested if x not in aliases]
     if invalid:
         raise ValueError(f"unsupported methods={invalid}")
+    methods = [aliases[x] for x in requested]
     out: list[str] = []
     for method in methods:
         if method not in out:
@@ -697,6 +1017,7 @@ def adapted_row(
     baseline_metrics: Mapping[str, float],
     adapted_metrics: Mapping[str, float],
     final_prior: Sequence[float],
+    method: str = "nctta_entmix",
 ) -> dict[str, Any]:
     row: dict[str, Any] = {
         "timestamp": now_str(),
@@ -706,7 +1027,7 @@ def adapted_row(
         "model_display": display_name(bundle.model_name),
         "seed": int(bundle.seed),
         "split": bundle.split,
-        "method": "nctta_entmix",
+        "method": method,
         "checkpoint_path": str(bundle.checkpoint_path),
     }
     for key in METRIC_ORDER:
@@ -734,7 +1055,7 @@ def write_overall_compact(results_root: Path) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Run baseline and NCTTA+EntMix on pretrained TabReD checkpoints.")
+    parser = argparse.ArgumentParser(description="Run baseline, NCTTA+EntMix, and NCTTA+DPLE on pretrained TabReD checkpoints.")
     parser.add_argument("--datasets", default=",".join(DEFAULT_DATASETS))
     parser.add_argument("--models", default=",".join(DEFAULT_MODELS))
     parser.add_argument("--seeds", default=",".join(str(x) for x in DEFAULT_SEEDS))
@@ -776,8 +1097,9 @@ def run(args: argparse.Namespace) -> int:
     for task_idx, (dataset_name, model_name, seed) in enumerate(tasks):
         if task_idx % args.num_shards != args.shard_index:
             continue
-        params = selected_hpo_params(dataset_name, model_name, args.selected_json)
-        batch_size = resolve_batch_size(params, model_name, args.batch_size)
+        primary_method = next((method for method in methods if method != "baseline"), "nctta_entmix")
+        primary_params = selected_hpo_params(dataset_name, model_name, args.selected_json, method=primary_method)
+        batch_size = resolve_batch_size(primary_params, model_name, args.batch_size)
         print(
             f"[tta] shard={args.shard_index}/{args.num_shards} task={task_idx} "
             f"dataset={dataset_name} model={model_name} seed={seed} methods={methods} "
@@ -813,8 +1135,12 @@ def run(args: argparse.Namespace) -> int:
                 save_predictions(results_root, dataset_name, "baseline", model_name, seed, baseline_prob, y_true)
 
             if "nctta_entmix" in methods:
-                cfg = cfg_from_params(params)
-                adapted_prob, adapted_y_true, final_prior = run_nctta_entmix_eval(bundle, batch_size, device=device, cfg=cfg)
+                params = selected_hpo_params(dataset_name, model_name, args.selected_json, method="nctta_entmix")
+                method_batch_size = resolve_batch_size(params, model_name, args.batch_size)
+                cfg = entmix_cfg_from_params(params)
+                adapted_prob, adapted_y_true, final_prior = run_nctta_entmix_eval(
+                    bundle, method_batch_size, device=device, cfg=cfg
+                )
                 adapted_metrics = compute_binary_metrics(adapted_y_true, adapted_prob)
                 print(
                     f"[tta-result] dataset={dataset_name} model={model_name} seed={seed} "
@@ -823,10 +1149,40 @@ def run(args: argparse.Namespace) -> int:
                 summary = results_root / dataset_name / "nctta_entmix" / "summary.csv"
                 compact = results_root / dataset_name / "nctta_entmix" / "summary_compact_runs.csv"
                 stats = results_root / dataset_name / "nctta_entmix" / "summary_stats.csv"
-                upsert_csv(summary, adapted_row(bundle, baseline_metrics, adapted_metrics, final_prior), tta_row_header(include_adapted=True), ["dataset", "method", "model", "seed"])
+                upsert_csv(
+                    summary,
+                    adapted_row(bundle, baseline_metrics, adapted_metrics, final_prior, method="nctta_entmix"),
+                    tta_row_header(include_adapted=True),
+                    ["dataset", "method", "model", "seed"],
+                )
                 upsert_csv(compact, build_compact_row(dataset_name, "nctta_entmix", model_name, seed, adapted_metrics), tta_compact_run_header(), ["dataset", "method", "model", "seed"])
                 update_group_stats(summary, stats, "model")
                 save_predictions(results_root, dataset_name, "nctta_entmix", model_name, seed, adapted_prob, adapted_y_true)
+
+            if "nctta_dple" in methods:
+                params = selected_hpo_params(dataset_name, model_name, args.selected_json, method="nctta_dple")
+                method_batch_size = resolve_batch_size(params, model_name, args.batch_size)
+                cfg = dple_cfg_from_params(params)
+                adapted_prob, adapted_y_true, final_prior = run_nctta_dple_eval(
+                    bundle, method_batch_size, device=device, cfg=cfg
+                )
+                adapted_metrics = compute_binary_metrics(adapted_y_true, adapted_prob)
+                print(
+                    f"[tta-result] dataset={dataset_name} model={model_name} seed={seed} "
+                    f"split={args.split} method=nctta_dple {format_terminal_metrics(adapted_metrics)}"
+                )
+                summary = results_root / dataset_name / "nctta_dple" / "summary.csv"
+                compact = results_root / dataset_name / "nctta_dple" / "summary_compact_runs.csv"
+                stats = results_root / dataset_name / "nctta_dple" / "summary_stats.csv"
+                upsert_csv(
+                    summary,
+                    adapted_row(bundle, baseline_metrics, adapted_metrics, final_prior, method="nctta_dple"),
+                    tta_row_header(include_adapted=True),
+                    ["dataset", "method", "model", "seed"],
+                )
+                upsert_csv(compact, build_compact_row(dataset_name, "nctta_dple", model_name, seed, adapted_metrics), tta_compact_run_header(), ["dataset", "method", "model", "seed"])
+                update_group_stats(summary, stats, "model")
+                save_predictions(results_root, dataset_name, "nctta_dple", model_name, seed, adapted_prob, adapted_y_true)
 
             write_dataset_method_summary(results_root, dataset_name)
             write_overall_compact(results_root)

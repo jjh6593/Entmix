@@ -81,18 +81,20 @@ python scripts/run_tta.py \
   --datasets ecom-offers \
   --models mlp \
   --seeds 0 \
-  --methods baseline,nctta_entmix
+  --methods baseline,nctta_entmix,nctta_dple
 
 # Add more datasets/models/seeds:
 #   --datasets ecom-offers,homecredit-default,homesite-insurance
 #   --models mlp,snn,dcn2,resnet,ft_transformer
 #   --seeds 0,1,2
+#   --methods baseline,nctta_entmix,nctta_dple
 ```
 
 Outputs:
 
 - `artifacts/results/<dataset>/baseline/summary.csv`
 - `artifacts/results/<dataset>/nctta_entmix/summary.csv`
+- `artifacts/results/<dataset>/nctta_dple/summary.csv`
 - `artifacts/results/<dataset>/method_summary.csv`
 - `artifacts/results/all_summary_compact_runs.csv`
 
@@ -112,7 +114,7 @@ python scripts/run_pipeline.py \
   --datasets ecom-offers \
   --models mlp \
   --seeds 0 \
-  --methods baseline,nctta_entmix \
+  --methods baseline,nctta_entmix,nctta_dple \
   --force_pretrain
 
 # Add more datasets/models/seeds:

@@ -72,7 +72,7 @@ DISPLAY_NAMES = {
 }
 
 SUPPORTED_TRAIN_FUNCTIONS = {"bin.nn_baselines.main"}
-METHOD_ORDER = {"baseline": 0, "unadapt": 0, "nctta_entmix": 1}
+METHOD_ORDER = {"baseline": 0, "unadapt": 0, "nctta_entmix": 1, "nctta_dple": 2}
 
 
 @dataclass(frozen=True)
