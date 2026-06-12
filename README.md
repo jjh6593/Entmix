@@ -9,6 +9,7 @@ cd Entmix
 conda env create -f environment.yml
 conda activate entmix-tabred
 
+pip install -e tabred
 pip install -e .
 python scripts/bootstrap_tabred.py
 ```
